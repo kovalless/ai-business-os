@@ -8,6 +8,20 @@
       "when": 1785599647536,
       "tag": "0000_open_wolf_cub",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785599903654,
+      "tag": "0001_fuzzy_chat",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785600049762,
+      "tag": "0002_medical_xavin",
+      "breakpoints": true
     }
   ]
 }
