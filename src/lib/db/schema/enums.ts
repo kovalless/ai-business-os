@@ -31,7 +31,7 @@ export const connectedSourceStatusEnum = pgEnum("connected_source_status", ["con
 export const taskPriorityEnum = pgEnum("task_priority", ["now", "soon", "whenever"]);
 
 export const calendarCategoryEnum = pgEnum("calendar_category", ["work", "marketing"]);
-export const calendarToneEnum = pgEnum("calendar_tone", ["neutral", "machine"]);
+export const calendarToneEnum = pgEnum("calendar_tone", ["neutral", "machine", "sent"]);
 
 export const noteKindEnum = pgEnum("note_kind", ["process", "supplier", "pricing", "decision", "person"]);
 export const documentKindEnum = pgEnum("document_kind", ["document", "playbook", "meeting", "process"]);

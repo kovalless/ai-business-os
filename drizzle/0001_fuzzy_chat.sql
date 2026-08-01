@@ -1,0 +1,1 @@
+ALTER TYPE "public"."calendar_tone" ADD VALUE 'sent';
