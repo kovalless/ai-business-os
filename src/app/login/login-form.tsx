@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { startTransition, useActionState, useState } from "react";
 import { Actuator, Field, Whisper } from "@/components/ui";
 import { loginAction, type LoginState } from "./actions";
 
@@ -16,7 +16,12 @@ export function LoginForm() {
       className="flex flex-col gap-stride"
       onSubmit={(e) => {
         e.preventDefault();
-        dispatch({ email, password });
+        // dispatch must run inside a transition — calling it bare
+        // desyncs `pending` and, observed in testing, can leave the
+        // action's navigation half-applied.
+        startTransition(() => {
+          dispatch({ email, password });
+        });
       }}
     >
       {state.error ? <Whisper tone="error">{state.error}</Whisper> : null}

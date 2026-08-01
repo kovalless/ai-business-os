@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { startTransition, useActionState, useState } from "react";
 import { Actuator, Field, Whisper } from "@/components/ui";
 import { acceptInviteAction, type AcceptInviteState } from "./actions";
 
@@ -17,7 +17,10 @@ export function AcceptInviteForm({ token }: { token: string }) {
       className="flex flex-col gap-stride"
       onSubmit={(e) => {
         e.preventDefault();
-        dispatch({ name, password });
+        // dispatch must run inside a transition — see login-form.tsx.
+        startTransition(() => {
+          dispatch({ name, password });
+        });
       }}
     >
       {state.error ? <Whisper tone="error">{state.error}</Whisper> : null}
