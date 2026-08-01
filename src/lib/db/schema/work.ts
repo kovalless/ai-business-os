@@ -16,9 +16,14 @@ export const tasks = pgTable("tasks", {
   // string. Loosening to nullable ("unassigned") later is a cheap
   // migration; the reverse is not, so faithful-to-mock is the safer
   // default here.
+  //
+  // onDelete is "cascade", not "restrict": tasks also cascades directly
+  // from businesses, so deleting a business must remove its tasks and its
+  // business_members in the same statement — "restrict" here would block
+  // that multi-path cascade whenever a member still owned a task.
   ownerMemberId: uuid("owner_member_id")
     .notNull()
-    .references(() => businessMembers.id, { onDelete: "restrict" }),
+    .references(() => businessMembers.id, { onDelete: "cascade" }),
   room: varchar("room", { length: 100 }),
   priority: taskPriorityEnum("priority").notNull().default("whenever"),
   done: boolean("done").notNull().default(false),
