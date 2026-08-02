@@ -51,9 +51,15 @@ export function relativeDays(days: number) {
 
 // "28 Jul" for the current year, "12 Mar 25" for any other year — the
 // short in-line date format the UI already expects on thread/invoice rows.
+//
+// Uses UTC getters deliberately, not local ones: date-only DB columns
+// (invoice due dates, etc.) parse as UTC midnight, and reading that back
+// with local getters rolls the displayed day back by one in any timezone
+// behind UTC. There's no real "local time" for a calendar date anyway.
+const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 export function formatShortDate(date: Date, now = new Date()) {
-  const day = date.getDate();
-  const month = date.toLocaleString("en-GB", { month: "short" });
-  if (date.getFullYear() === now.getFullYear()) return `${day} ${month}`;
-  return `${day} ${month} ${String(date.getFullYear()).slice(-2)}`;
+  const day = date.getUTCDate();
+  const month = SHORT_MONTHS[date.getUTCMonth()];
+  if (date.getUTCFullYear() === now.getUTCFullYear()) return `${day} ${month}`;
+  return `${day} ${month} ${String(date.getUTCFullYear()).slice(-2)}`;
 }
