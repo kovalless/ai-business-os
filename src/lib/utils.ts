@@ -48,3 +48,12 @@ export function relativeDays(days: number) {
   if (days < 60) return `${Math.round(days / 7)} weeks ago`;
   return `${Math.round(days / 30)} months ago`;
 }
+
+// "28 Jul" for the current year, "12 Mar 25" for any other year — the
+// short in-line date format the UI already expects on thread/invoice rows.
+export function formatShortDate(date: Date, now = new Date()) {
+  const day = date.getDate();
+  const month = date.toLocaleString("en-GB", { month: "short" });
+  if (date.getFullYear() === now.getFullYear()) return `${day} ${month}`;
+  return `${day} ${month} ${String(date.getFullYear()).slice(-2)}`;
+}
