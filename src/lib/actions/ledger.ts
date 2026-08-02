@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { figures, invoices, people } from "@/lib/db/schema";
 import type { FigureData, Invoice } from "@/lib/types";
@@ -65,7 +65,11 @@ export async function listInvoices(businessId: string): Promise<Invoice[]> {
     .from(invoices)
     .innerJoin(people, eq(people.id, invoices.personId))
     .where(eq(invoices.businessId, businessId))
-    .orderBy(desc(invoices.issuedAt));
+    // Postgres sorts NULL first in DESC order by default, which would
+    // put every draft (no issuedAt yet) at the top of the list — an
+    // artifact caught by actually looking at the rendered table, not
+    // something the type layer would ever flag.
+    .orderBy(sql`${invoices.issuedAt} DESC NULLS LAST`);
 
   return rows.map((i) => ({
     id: i.id,
