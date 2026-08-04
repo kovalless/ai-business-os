@@ -56,7 +56,7 @@ export function relativeDays(days: number) {
 // (invoice due dates, etc.) parse as UTC midnight, and reading that back
 // with local getters rolls the displayed day back by one in any timezone
 // behind UTC. There's no real "local time" for a calendar date anyway.
-const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export const SHORT_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 export function formatShortDate(date: Date, now = new Date()) {
   const day = date.getUTCDate();
   const month = SHORT_MONTHS[date.getUTCMonth()];
