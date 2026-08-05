@@ -4,15 +4,16 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, CornerDownLeft, Search } from "lucide-react";
-import { campaigns, invoices, notes, people, rooms, tasks } from "@/lib/data";
+import { rooms } from "@/lib/rooms";
 import { cx, money } from "@/lib/utils";
 import { D } from "@/lib/motion";
 import { Gauge } from "@/components/ui";
+import { useApertureData, type ApertureData } from "./ApertureProvider";
 
 type Kind = "Go" | "Do" | "Ask" | "Make";
 type Item = { id: string; kind: Kind; label: string; sub?: string; href?: string; answer?: string };
 
-function buildIndex(): Item[] {
+function buildIndex(data: ApertureData): Item[] {
   const go: Item[] = rooms.map((r) => ({
     id: `go-${r.key}`,
     kind: "Go",
@@ -21,7 +22,7 @@ function buildIndex(): Item[] {
     href: r.href,
   }));
 
-  const persons: Item[] = people.map((p) => ({
+  const persons: Item[] = data.people.map((p) => ({
     id: `go-p-${p.id}`,
     kind: "Go",
     label: p.name,
@@ -29,7 +30,7 @@ function buildIndex(): Item[] {
     href: `/people/${p.id}`,
   }));
 
-  const inv: Item[] = invoices.map((i) => ({
+  const inv: Item[] = data.invoices.map((i) => ({
     id: `go-i-${i.id}`,
     kind: "Go",
     label: i.ref,
@@ -37,7 +38,7 @@ function buildIndex(): Item[] {
     href: "/ledger",
   }));
 
-  const camp: Item[] = campaigns.map((c) => ({
+  const camp: Item[] = data.campaigns.map((c) => ({
     id: `go-c-${c.id}`,
     kind: "Go",
     label: c.name,
@@ -45,7 +46,7 @@ function buildIndex(): Item[] {
     href: "/reach",
   }));
 
-  const note: Item[] = notes.map((n) => ({
+  const note: Item[] = data.notes.map((n) => ({
     id: `go-n-${n.id}`,
     kind: "Go",
     label: n.title,
@@ -53,7 +54,7 @@ function buildIndex(): Item[] {
     href: "/record",
   }));
 
-  const task: Item[] = tasks
+  const task: Item[] = data.tasks
     .filter((t) => !t.done)
     .map((t) => ({ id: `go-t-${t.id}`, kind: "Go", label: t.title, sub: `Work \u00B7 due ${t.due}`, href: "/work" }));
 
@@ -79,13 +80,14 @@ function buildIndex(): Item[] {
 }
 
 export function Aperture() {
+  const data = useApertureData();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [cursor, setCursor] = useState(0);
   const [answer, setAnswer] = useState<Item | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const index = useMemo(buildIndex, []);
+  const index = useMemo(() => buildIndex(data), [data]);
 
   const results = useMemo(() => {
     const term = q.trim().toLowerCase();

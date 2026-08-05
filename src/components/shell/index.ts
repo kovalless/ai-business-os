@@ -1,4 +1,5 @@
 export * from "./Aperture";
+export * from "./ApertureProvider";
 export * from "./Frame";
 export * from "./Lintel";
 export * from "./Margin";
