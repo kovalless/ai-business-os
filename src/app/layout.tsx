@@ -1,13 +1,32 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Frame } from "@/components/shell";
+import { getLedgerFigures } from "@/lib/actions/ledger";
+import { getBusinessSettings } from "@/lib/actions/settings";
+import { getCurrentMember } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "AI Business OS",
   description: "The daily workspace for a small business.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Frame (and the Rail inside it) renders on every route, including
+// unauthenticated ones like /login — so this fetch is session-aware
+// rather than assuming a business exists. getCurrentMember() is the
+// non-throwing lookup (same one /login itself uses) precisely because
+// this layout must not redirect.
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const member = await getCurrentMember();
+  const rail = member
+    ? await (async () => {
+        const [business, figures] = await Promise.all([
+          getBusinessSettings(member.businessId),
+          getLedgerFigures(member.businessId),
+        ]);
+        return { businessName: business?.name ?? null, standing: figures.standing };
+      })()
+    : null;
+
   return (
     <html lang="en">
       <body>
@@ -17,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to the field
         </a>
-        <Frame>{children}</Frame>
+        <Frame rail={rail}>{children}</Frame>
       </body>
     </html>
   );

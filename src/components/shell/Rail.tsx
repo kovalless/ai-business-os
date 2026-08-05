@@ -13,7 +13,8 @@ import {
   Sun,
   Users,
 } from "lucide-react";
-import { business, rooms } from "@/lib/data";
+import { rooms } from "@/lib/rooms";
+import type { FigureData } from "@/lib/types";
 import { cx, money } from "@/lib/utils";
 import { Mark } from "./Mark";
 
@@ -28,7 +29,9 @@ const ICONS: Record<string, React.ElementType> = {
   chart: LineChart,
 };
 
-export function Rail() {
+export type RailData = { businessName: string | null; standing: FigureData | null };
+
+export function Rail({ data }: { data: RailData | null }) {
   const path = usePathname();
 
   return (
@@ -41,7 +44,9 @@ export function Rail() {
         className="mb-bay flex h-8 items-center gap-rise px-[6px] text-ink xl:px-step"
       >
         <Mark size={20} />
-        <span className="hidden text-bodysm font-medium text-ink xl:inline">{business.name}</span>
+        <span className="hidden text-bodysm font-medium text-ink xl:inline">
+          {data?.businessName ?? "AI Business OS"}
+        </span>
       </Link>
 
       <ul className="flex w-full flex-col gap-[2px]">
@@ -78,10 +83,12 @@ export function Rail() {
       </ul>
 
       <div className="mt-auto w-full">
-        <div className="hidden px-rise xl:block">
-          <p className="text-label uppercase text-ink-3">{business.pinned.label}</p>
-          <p className="num mt-tick text-fm font-medium text-ink">{money(business.pinned.value)}</p>
-        </div>
+        {data?.standing ? (
+          <div className="hidden px-rise xl:block">
+            <p className="text-label uppercase text-ink-3">{data.standing.label}</p>
+            <p className="num mt-tick text-fm font-medium text-ink">{money(data.standing.value)}</p>
+          </div>
+        ) : null}
         <Link
           href="/settings"
           title="Settings"
