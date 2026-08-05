@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { rooms } from "@/lib/data";
+import { rooms } from "@/lib/rooms";
 import { D } from "@/lib/motion";
 import { useMargin } from "./MarginProvider";
 
