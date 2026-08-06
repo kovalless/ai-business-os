@@ -1,4 +1,5 @@
 import { and, desc, eq, inArray, max, sql } from "drizzle-orm";
+import { cache } from "react";
 import { db } from "@/lib/db/client";
 import { activities, businessMembers, invoices, people, personCompanyInfo } from "@/lib/db/schema";
 import type { Invoice, ThreadEntry } from "@/lib/types";
@@ -89,7 +90,9 @@ function invoiceTotalsQuery(businessId: string, personIds: string[]) {
     .groupBy(invoices.personId);
 }
 
-export async function listPeople(businessId: string): Promise<PersonSummary[]> {
+// Wrapped in cache() — called from both the root layout (Aperture's
+// search index) and this room's own page within the same request.
+export const listPeople = cache(async (businessId: string): Promise<PersonSummary[]> => {
   const rows = await db.select().from(people).where(eq(people.businessId, businessId));
   if (rows.length === 0) return [];
 
@@ -127,7 +130,7 @@ export async function listPeople(businessId: string): Promise<PersonSummary[]> {
       attention: p.attentionNote ?? undefined,
     };
   });
-}
+});
 
 // Powers the People list room's margin. Both signals are computed from
 // real per-business data (not hardcoded to any one seeded person, unlike

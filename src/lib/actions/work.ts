@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import { cache } from "react";
 import { db } from "@/lib/db/client";
 import { businessMembers, calendarEvents, tasks } from "@/lib/db/schema";
 import type { CalendarEntry } from "@/components/ui";
@@ -59,7 +60,10 @@ export type WorkTask = Task & { priority: "now" | "soon" | "whenever" };
 // column is a business_members reference. priority is a real column on
 // the DB row, so (unlike the mock's separate `priorityOf` map) it's just
 // part of the task here.
-export async function listTasks(businessId: string): Promise<WorkTask[]> {
+//
+// Wrapped in cache() — called from both the root layout (Aperture's
+// search index) and this room's own page within the same request.
+export const listTasks = cache(async (businessId: string): Promise<WorkTask[]> => {
   const rows = await db
     .select({
       id: tasks.id,
@@ -90,7 +94,7 @@ export async function listTasks(businessId: string): Promise<WorkTask[]> {
     amount: t.amount ? Number(t.amount) : undefined,
     priority: t.priority,
   }));
-}
+});
 
 export type UpcomingItem = { id: string; title: string; when: string; who: string; where: string };
 

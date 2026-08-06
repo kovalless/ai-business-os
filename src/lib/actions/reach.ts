@@ -1,4 +1,5 @@
 import { asc, eq } from "drizzle-orm";
+import { cache } from "react";
 import { db } from "@/lib/db/client";
 import { businesses, calendarEvents, campaignSeasons, campaigns, contentIdeas } from "@/lib/db/schema";
 import type { CalendarEntry } from "@/components/ui";
@@ -66,7 +67,10 @@ export type ReachCampaign = {
 // DB enum values (sent/scheduled/draft/proposed) already match the UI's
 // STATUS_TONE keys directly — no display translation needed, unlike the
 // Ledger and People rooms' underscore-vs-space enum mismatches.
-export async function listCampaigns(businessId: string): Promise<ReachCampaign[]> {
+//
+// Wrapped in cache() — called from both the root layout (Aperture's
+// search index) and this room's own page within the same request.
+export const listCampaigns = cache(async (businessId: string): Promise<ReachCampaign[]> => {
   const rows = await db
     .select()
     .from(campaigns)
@@ -82,7 +86,7 @@ export async function listCampaigns(businessId: string): Promise<ReachCampaign[]
     audience: c.audienceCount,
     result: c.resultSummary ?? "",
   }));
-}
+});
 
 // Marketing-category slice of the same calendar_events table the Work
 // room reads (category='work'). One table, two rooms — see the mock's

@@ -1,4 +1,5 @@
 import { and, eq, sql } from "drizzle-orm";
+import { cache } from "react";
 import { db } from "@/lib/db/client";
 import { figures, invoices, people } from "@/lib/db/schema";
 import type { FigureData, Invoice } from "@/lib/types";
@@ -33,7 +34,10 @@ function toFigureData(row: typeof figures.$inferSelect): FigureData {
   };
 }
 
-export async function getLedgerFigures(businessId: string): Promise<{ standing: FigureData | null; supporting: FigureData[] }> {
+// Wrapped in React's cache() because this is called both from the root
+// layout (for the Rail's pinned figure) and from this room's own page —
+// without it, every request would run the underlying query twice.
+export const getLedgerFigures = cache(async (businessId: string): Promise<{ standing: FigureData | null; supporting: FigureData[] }> => {
   const rows = await db.select().from(figures).where(eq(figures.businessId, businessId));
   const byKey = new Map(rows.map((r) => [r.key, r]));
 
@@ -46,9 +50,11 @@ export async function getLedgerFigures(businessId: string): Promise<{ standing: 
     standing: standingRow ? toFigureData(standingRow) : null,
     supporting,
   };
-}
+});
 
-export async function listInvoices(businessId: string): Promise<Invoice[]> {
+// Wrapped for the same reason as getLedgerFigures above — called from
+// both the root layout (Aperture's search index) and this room's page.
+export const listInvoices = cache(async (businessId: string): Promise<Invoice[]> => {
   const rows = await db
     .select({
       id: invoices.id,
@@ -83,7 +89,7 @@ export async function listInvoices(businessId: string): Promise<Invoice[]> {
     daysOver: i.daysOver ?? undefined,
     job: i.jobDescription ?? "",
   }));
-}
+});
 
 export type OverdueSignal = {
   personId: string;

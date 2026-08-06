@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import { cache } from "react";
 import { db } from "@/lib/db/client";
 import { businesses, connectedSources } from "@/lib/db/schema";
 
@@ -8,7 +9,9 @@ const STANDING_FIGURE_LABELS: Record<string, string> = {
 
 export type BusinessSettings = { name: string; trade: string; standingFigureLabel: string };
 
-export async function getBusinessSettings(businessId: string): Promise<BusinessSettings | null> {
+// Wrapped in cache() — called from both the root layout (Rail's
+// business name) and this room's own page within the same request.
+export const getBusinessSettings = cache(async (businessId: string): Promise<BusinessSettings | null> => {
   const [row] = await db.select().from(businesses).where(eq(businesses.id, businessId)).limit(1);
   if (!row) return null;
 
@@ -17,7 +20,7 @@ export async function getBusinessSettings(businessId: string): Promise<BusinessS
     trade: row.trade,
     standingFigureLabel: STANDING_FIGURE_LABELS[row.standingFigureKey] ?? row.standingFigureKey,
   };
-}
+});
 
 export type ConnectedSource = { id: string; name: string; detail: string; ok: boolean };
 

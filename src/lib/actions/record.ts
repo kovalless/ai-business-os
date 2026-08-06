@@ -1,4 +1,5 @@
 import { desc, eq, inArray } from "drizzle-orm";
+import { cache } from "react";
 import { db } from "@/lib/db/client";
 import { businessMembers, documentLinks, documents, notes } from "@/lib/db/schema";
 import { formatShortDate } from "@/lib/utils";
@@ -29,7 +30,10 @@ export type WorkspaceNote = {
 // string[] of titles) genuinely needs both documents and notes fetched
 // together, since a link can point at either. Splitting this into
 // separate exports would just mean re-fetching one of them internally.
-export async function getKnowledgeBase(businessId: string): Promise<{ documents: WorkspaceDoc[]; notes: WorkspaceNote[] }> {
+//
+// Wrapped in cache() — called from both the root layout (Aperture's
+// search index needs the notes) and this room's own page.
+export const getKnowledgeBase = cache(async (businessId: string): Promise<{ documents: WorkspaceDoc[]; notes: WorkspaceNote[] }> => {
   const [documentRows, noteRows] = await Promise.all([
     db
       .select({
@@ -91,4 +95,4 @@ export async function getKnowledgeBase(businessId: string): Promise<{ documents:
   }));
 
   return { documents: documentsOut, notes: notesOut };
-}
+});
