@@ -3,6 +3,7 @@
 import { useId } from "react";
 import type { SeriesPoint } from "@/lib/types";
 import { money, num } from "@/lib/utils";
+import { Empty } from "./Empty";
 
 export function LineChart({
   sentence,
@@ -25,6 +26,19 @@ export function LineChart({
   const padR = 64;
   const padT = 16;
   const padB = 28;
+
+  // Math.max(...[]) is -Infinity and primary[primary.length - 1] is
+  // undefined for an empty series — render an empty state instead of
+  // producing a broken chart or throwing on the last-point read below.
+  if (primary.length === 0) {
+    return (
+      <figure className="w-full">
+        <figcaption className="text-bodysm text-ink-body">{sentence}</figcaption>
+        <Empty kind="unfilled" title="Nothing to chart yet." className="mt-stride" />
+      </figure>
+    );
+  }
+
   const max = Math.max(...primary.map((p) => p.value), ...(comparison ?? []).map((p) => p.value));
   const top = Math.ceil((max * 1.12) / 1000) * 1000;
   const step = (w - padL - padR) / Math.max(1, primary.length - 1);
@@ -49,7 +63,7 @@ export function LineChart({
           stroke="var(--v-hair)"
           strokeWidth="1"
         />
-        {comparison ? (
+        {comparison && comparison.length > 0 ? (
           <path
             d={path(comparison)}
             fill="none"
@@ -110,7 +124,7 @@ export function LineChart({
         >
           {currency ? money(primary[primary.length - 1]!.value) : num(primary[primary.length - 1]!.value)}
         </text>
-        {comparison ? (
+        {comparison && comparison.length > 0 ? (
           <text
             x={w - padR + 8}
             y={y(comparison[comparison.length - 1]!.value) + 4}
