@@ -20,7 +20,7 @@ import type { Column } from "@/components/ui";
 import { Proposal } from "@/components/ai/Proposal";
 import type { ReachCampaign, ReachIdea, ReachPerformanceRow, ReachSeason, SendGate } from "@/lib/actions/reach";
 import type { CalendarEntry } from "@/components/ui";
-import { money, num } from "@/lib/utils";
+import { num } from "@/lib/utils";
 
 type View = "seasons" | "calendar" | "ideas" | "performance";
 
