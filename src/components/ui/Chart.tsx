@@ -139,48 +139,6 @@ export function LineChart({
   );
 }
 
-export function BarPair({
-  sentence,
-  rows,
-}: {
-  sentence: string;
-  rows: { label: string; hours: number; margin: number }[];
-}) {
-  return (
-    <figure className="w-full">
-      <figcaption className="text-bodysm text-ink-body">{sentence}</figcaption>
-      <div className="mt-stride flex flex-col gap-rise">
-        {rows.map((r) => (
-          <div key={r.label}>
-            <div className="flex items-baseline justify-between">
-              <span className="text-bodysm text-ink-body">{r.label}</span>
-              <span className="num text-caption text-ink-3">
-                {r.hours}% of hours &middot; {r.margin}% of margin
-              </span>
-            </div>
-            <div className="mt-step flex gap-thread">
-              <div className="h-[2px] bg-iron" style={{ width: `${r.hours * 2}%` }} />
-            </div>
-            <div className="mt-[3px] flex gap-thread">
-              <div className="h-[2px] bg-ledger-60" style={{ width: `${r.margin * 2}%` }} />
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="mt-stride flex gap-stride">
-        <span className="text-caption text-ink-3">
-          <span className="mr-step inline-block h-[2px] w-4 align-middle bg-iron" />
-          hours
-        </span>
-        <span className="text-caption text-ink-3">
-          <span className="mr-step inline-block h-[2px] w-4 align-middle bg-ledger-60" />
-          margin
-        </span>
-      </div>
-    </figure>
-  );
-}
-
 export function Sparkline({ points }: { points: SeriesPoint[] }) {
   const max = Math.max(...points.map((p) => p.value));
   const min = Math.min(...points.map((p) => p.value));
