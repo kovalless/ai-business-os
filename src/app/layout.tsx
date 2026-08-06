@@ -15,6 +15,16 @@ export const metadata: Metadata = {
   description: "The daily workspace for a small business.",
 };
 
+// Extracts a settled promise's value, or a safe fallback if that one
+// query failed — so one bad query (e.g. a transient Neon hiccup) only
+// degrades the specific piece of shell UI it feeds, instead of failing
+// the whole Promise.all and taking down every route in the app with it.
+function settled<T>(result: PromiseSettledResult<T>, fallback: T): T {
+  if (result.status === "fulfilled") return result.value;
+  console.error("Root layout: shell data fetch failed", result.reason);
+  return fallback;
+}
+
 // Frame (Rail and the Aperture command palette inside it) renders on
 // every route, including unauthenticated ones like /login — so this
 // fetch is session-aware rather than assuming a business exists.
@@ -33,15 +43,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let apertureData: ApertureData = { people: [], invoices: [], campaigns: [], notes: [], tasks: [] };
 
   if (member) {
-    const [business, figures, people, invoices, campaigns, knowledgeBase, tasks] = await Promise.all([
-      getBusinessSettings(member.businessId),
-      getLedgerFigures(member.businessId),
-      listPeople(member.businessId),
-      listInvoices(member.businessId),
-      listCampaigns(member.businessId),
-      getKnowledgeBase(member.businessId),
-      listTasks(member.businessId),
-    ]);
+    const [businessResult, figuresResult, peopleResult, invoicesResult, campaignsResult, knowledgeBaseResult, tasksResult] =
+      await Promise.allSettled([
+        getBusinessSettings(member.businessId),
+        getLedgerFigures(member.businessId),
+        listPeople(member.businessId),
+        listInvoices(member.businessId),
+        listCampaigns(member.businessId),
+        getKnowledgeBase(member.businessId),
+        listTasks(member.businessId),
+      ]);
+
+    const business = settled(businessResult, null);
+    const figures = settled(figuresResult, { standing: null, supporting: [] });
+    const people = settled(peopleResult, []);
+    const invoices = settled(invoicesResult, []);
+    const campaigns = settled(campaignsResult, []);
+    const knowledgeBase = settled(knowledgeBaseResult, { documents: [], notes: [] });
+    const tasks = settled(tasksResult, []);
+
     rail = { businessName: business?.name ?? null, standing: figures.standing };
     apertureData = { people, invoices, campaigns, notes: knowledgeBase.notes, tasks };
   }
