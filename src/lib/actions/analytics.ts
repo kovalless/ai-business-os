@@ -194,3 +194,13 @@ export function getCustomersSentence(series: AnalyticsSeries): string {
   if (!last || !first) return "";
   return `${last.value} customers have ordered in the last twelve months, ${last.value - first.value} more than at the start of this window.`;
 }
+
+// Replaces the mock's fixed "...if the two open Kessler invoices land"
+// framing — no schema tracks which specific invoices a cash forecast
+// assumes, so that causal claim isn't something this can honestly
+// assert. What's real and computable is where the series itself ends up.
+export function getCashflowSentence(series: AnalyticsSeries): string {
+  const last = series.cashflow.at(-1);
+  if (!last) return "";
+  return `Cash reaches ${money(last.value)} by ${last.label}.`;
+}

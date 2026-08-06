@@ -29,6 +29,7 @@ export function LongViewView({
   revenueSentence,
   hoursSentence,
   customersSentence,
+  cashflowSentence,
 }: {
   series: AnalyticsSeries;
   insights: AnalyticsInsight[];
@@ -39,6 +40,7 @@ export function LongViewView({
   revenueSentence: string;
   hoursSentence: string;
   customersSentence: string;
+  cashflowSentence: string;
 }) {
   const [grain, setGrain] = useState<GrainValue>("Month");
   const [view, setView] = useState<View>("revenue");
@@ -131,11 +133,7 @@ export function LongViewView({
 
       {view === "cash" ? (
         <section className="mt-court max-w-[720px]">
-          <LineChart
-            sentence="Cash recovers through August and September if the two open Kessler invoices land."
-            primary={series.cashflow}
-            forecastFrom={5}
-          />
+          <LineChart sentence={cashflowSentence} primary={series.cashflow} forecastFrom={5} />
           <p className="mt-rise text-caption text-ink-3">
             The shaded months are a forecast, not a record.
           </p>

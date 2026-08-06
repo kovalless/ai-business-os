@@ -2,6 +2,7 @@ import {
   buildQuestions,
   getAnalyticsInsights,
   getAnalyticsSeries,
+  getCashflowSentence,
   getCustomersSentence,
   getGrowthRows,
   getHoursSentence,
@@ -26,6 +27,7 @@ export default async function LongViewPage() {
   const revenueSentence = getRevenueSentence(series);
   const hoursSentence = getHoursSentence(series);
   const customersSentence = getCustomersSentence(series);
+  const cashflowSentence = getCashflowSentence(series);
 
   return (
     <LongViewView
@@ -38,6 +40,7 @@ export default async function LongViewPage() {
       revenueSentence={revenueSentence}
       hoursSentence={hoursSentence}
       customersSentence={customersSentence}
+      cashflowSentence={cashflowSentence}
     />
   );
 }
