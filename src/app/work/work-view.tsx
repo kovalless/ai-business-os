@@ -7,7 +7,7 @@ import { Actuator, Calendar, Empty, Field, Label, Row, Shelf, Tabs, Token } from
 import type { CalendarEntry } from "@/components/ui";
 import { Proposal } from "@/components/ai/Proposal";
 import type { UpcomingItem, WorkSignals, WorkTask } from "@/lib/actions/work";
-import { cx, money } from "@/lib/utils";
+import { cx, getMonthGrid, money } from "@/lib/utils";
 import { D, descend, stagger } from "@/lib/motion";
 
 type View = "today" | "upcoming" | "done";
@@ -27,17 +27,6 @@ const MONTH_NAMES = [
   "November",
   "December",
 ];
-
-// Calendar's week header is Monday-first ("Mo".."Su"), unlike
-// Date.getUTCDay()'s Sunday-first (0=Sun) — converting once here rather
-// than hardcoding a fixed month/firstWeekday as the original page did.
-function getMonthGrid(now: Date) {
-  const year = now.getUTCFullYear();
-  const month = now.getUTCMonth();
-  const days = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-  const firstWeekday = (new Date(Date.UTC(year, month, 1)).getUTCDay() + 6) % 7;
-  return { monthLabel: `${MONTH_NAMES[month]} ${year}`, days, firstWeekday };
-}
 
 export function WorkView({
   tasks,

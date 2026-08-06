@@ -63,3 +63,29 @@ export function formatShortDate(date: Date, now = new Date()) {
   if (date.getUTCFullYear() === now.getUTCFullYear()) return `${day} ${month}`;
   return `${day} ${month} ${String(date.getUTCFullYear()).slice(-2)}`;
 }
+
+const FULL_MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+// Monday-first month grid (unlike Date.getUTCDay()'s Sunday-first,
+// 0=Sun) for the Work and Reach rooms' Calendar tabs. Was defined
+// identically in both work-view.tsx and reach-view.tsx; shared here.
+export function getMonthGrid(now: Date): { monthLabel: string; days: number; firstWeekday: number } {
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth();
+  const days = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  const firstWeekday = (new Date(Date.UTC(year, month, 1)).getUTCDay() + 6) % 7;
+  return { monthLabel: `${FULL_MONTHS[month]} ${year}`, days, firstWeekday };
+}

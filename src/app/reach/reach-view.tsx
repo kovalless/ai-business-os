@@ -20,7 +20,7 @@ import type { Column } from "@/components/ui";
 import { Proposal } from "@/components/ai/Proposal";
 import type { ReachCampaign, ReachIdea, ReachPerformanceRow, ReachSeason, SendGate } from "@/lib/actions/reach";
 import type { CalendarEntry } from "@/components/ui";
-import { num } from "@/lib/utils";
+import { getMonthGrid, num } from "@/lib/utils";
 
 type View = "seasons" | "calendar" | "ideas" | "performance";
 
@@ -45,17 +45,6 @@ const MONTH_NAMES = [
   "November",
   "December",
 ];
-
-// Same Monday-first month-grid conversion as the Work room's Calendar
-// tab, computed against real time instead of the mock's fixed "August
-// 2026" / days=31 / firstWeekday=5.
-function getMonthGrid(now: Date) {
-  const year = now.getUTCFullYear();
-  const month = now.getUTCMonth();
-  const days = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-  const firstWeekday = (new Date(Date.UTC(year, month, 1)).getUTCDay() + 6) % 7;
-  return { monthLabel: `${MONTH_NAMES[month]} ${year}`, days, firstWeekday };
-}
 
 type Perf = ReachPerformanceRow;
 
